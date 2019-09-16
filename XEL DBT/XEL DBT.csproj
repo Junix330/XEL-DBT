@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\Database.cs" />
+    <Compile Include="Class\Script.cs" />
     <Compile Include="Class\Xyz.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
