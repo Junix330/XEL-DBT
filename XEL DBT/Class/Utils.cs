@@ -3,9 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace XEL_DBT
 {
+
+    public static class XtraMsg
+    {
+        public static void Show(string msg, string title = "")
+        {
+            MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public static void Warn(string msg, string title = "")
+        {
+            MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+        public static void Error(string msg, string title = "")
+        {
+            MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+
+        public static void Info(string msg, string title = "")
+        {
+            MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+    }
+
+
     public class Utils
     {
 
