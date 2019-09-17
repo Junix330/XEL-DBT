@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,36 @@ namespace XEL_DBT
 
         public string Password { get; set; }
 
+        public bool Test()
+        {
+            var s = string.Format("Data Source={0}; User ID='{1}'; Password='{2}'; Initial Catalog='{3}';", Server, Username, Password, Database);
+            var c = new SqlConnection(s);
+
+            try
+            {
+                c.Open();
+                if (c.State == System.Data.ConnectionState.Open)
+                {
+                    c.Close();
+                    c.Dispose();
+                    return true;
+                }
+
+                else
+                {
+                    c.Dispose();
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                XtraMsg.Error(ex.Message);
+                return false;
+            }
+        }
+
+
     }
 
 
@@ -26,6 +57,9 @@ namespace XEL_DBT
         string q = "";
         Script script;
 
+        public string PhysicalMDF { get; set; }
+
+        public string PhysicalLDF { get; set; }
 
 
         public Database(Conn Connection)
@@ -35,29 +69,34 @@ namespace XEL_DBT
         }
 
 
-        public void Detach()
+        public bool Detach()
         {
             //single user. disconnect all
-            q = string.Format("alter database [{0}] set single_user with rollback immediate", Con.Database);
+
+            q = string.Format("", Con.Database);
             script.Run(q);
 
-            q = string.Format("EXEC sp_detach_db '{0}', 'true';", Con.Database);
+            q = string.Format("USE [master]; alter database [{0}] set single_user with rollback immediate; EXEC sp_detach_db '{0}', 'true';", Con.Database);
             script.Run(q);
 
+            return true;
         }
 
-        public void Attach()
+        public bool Attach()
         {
-
-            q = string.Format("CREATE DATABASE [{0}] ON (FILENAME = '{1}'),(FILENAME = '{2}') FOR ATTACH;  ", Con.Database, GetMDF(), GetLDF());
+            //var script = new Script();
+            q = string.Format("CREATE DATABASE [{0}] ON (FILENAME = '{1}'),(FILENAME = '{2}') FOR ATTACH;  ", Con.Database, PhysicalMDF, PhysicalLDF);
             script.Run(q);
+
 
             //set multi user
             q = string.Format("alter database [{0}] set MULTI_USER", Con.Database);
             script.Run(q);
+
+            return false;
         }
 
-        private string GetMDF()
+        public string GetMDF()
         {
             q = string.Format("SELECT type,physical_name FROM sys.database_files WHERE type=0");
             var dt = script.Run(q, "DT");
@@ -73,10 +112,12 @@ namespace XEL_DBT
                 return "";
             }
 
-            return Utils.Clean(dt.Rows[0][1]);
+            this.PhysicalMDF = Utils.Clean(dt.Rows[0][1]);
+
+            return this.PhysicalMDF;
         }
 
-        private string GetLDF()
+        public string GetLDF()
         {
             q = string.Format("SELECT type,physical_name FROM sys.database_files WHERE type=1");
             var dt = script.Run(q, "DT");
@@ -92,7 +133,10 @@ namespace XEL_DBT
                 return "";
             }
 
-            return Utils.Clean(dt.Rows[0][1]);
+
+            this.PhysicalLDF = Utils.Clean(dt.Rows[0][1]);
+
+            return this.PhysicalLDF;
         }
 
 

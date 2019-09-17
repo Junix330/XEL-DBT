@@ -12,12 +12,17 @@ using System.Windows.Forms;
 
 namespace XEL_DBT
 {
-    public partial class Form1 : MaterialForm
+    public partial class frmMain : MaterialForm
     {
+        Conn con;
+        Database db;
         MaterialSkinManager sman;
+        
 
 
-        public Form1()
+
+
+        public frmMain()
         {
             sman = MaterialSkinManager.Instance;
             sman.AddFormToManage(this);
@@ -26,6 +31,59 @@ namespace XEL_DBT
 
 
             InitializeComponent();
+        }
+
+
+        private void BtnDetach_Click(object sender, EventArgs e)
+        {
+            if(db == null)
+            {
+                XtraMsg.Error("CONNECTION MUST ESTABLISTED FIRST!");
+                return;
+            }
+
+            txtMdfLoc.Text = db.GetMDF();
+            txtLdfLoc.Text = db.GetLDF();
+
+            db.Detach();
+        }
+
+        private void BtnAttach_Click(object sender, EventArgs e)
+        {
+            if (db == null)
+            {
+                XtraMsg.Error("CONNECTION MUST ESTABLISTED FIRST!");
+                return;
+            }
+
+            db.Attach();
+        }
+
+        private void Form_Shown(object sender, EventArgs e)
+        {
+      
+
+        }
+
+        private void BtnConn_Click(object sender, EventArgs e)
+        {
+            con = new Conn();
+            con.Database = txtDb.Text;
+            con.Server = txtServer.Text;
+            con.Username = txtUser.Text;
+            con.Password = txtPass.Text;
+
+            if (!con.Test())
+            {
+                XtraMsg.Warn("CANT CONNECT TO SERVER!");
+                return;
+            }
+            else
+            {
+                XtraMsg.Info("CONNECTED TO SERVER!");
+            }
+
+            db = new Database(con);
         }
     }
 }

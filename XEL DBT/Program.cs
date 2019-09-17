@@ -17,7 +17,7 @@ namespace XEL_DBT
             SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new frmMain());
         }
 
         [DllImport("User32.dll")]
