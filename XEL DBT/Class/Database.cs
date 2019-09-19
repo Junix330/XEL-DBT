@@ -73,7 +73,7 @@ namespace XEL_DBT
         {
             //single user. disconnect all
 
-            q = string.Format("", Con.Database);
+            q = string.Format("USE [master];", Con.Database);
             script.Run(q);
 
             q = string.Format("USE [master]; alter database [{0}] set single_user with rollback immediate; EXEC sp_detach_db '{0}', 'true';", Con.Database);
